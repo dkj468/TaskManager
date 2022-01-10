@@ -34,9 +34,8 @@ namespace API
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
             });
-            services.AddDbContext<DataContext>(options =>
-            {
-                options.UseNpgsql(_config.GetConnectionString("DefaultConnectionString")
+            services.AddDbContext<DataContext>(options => {
+                options.UseNpgsql(_config.GetConnectionString("DefaultConnection"));
             });
         }
 
