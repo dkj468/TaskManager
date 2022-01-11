@@ -1,4 +1,6 @@
-﻿using Domain;
+﻿using Application.Activities;
+using Domain;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,52 +13,43 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ActivityController : ControllerBase
+    public class ActivityController : BaseApiController
     {
-        private readonly DataContext _context;
-        public ActivityController(DataContext context)
-        {
-            _context = context;
-        }
-
         [HttpGet]
         public async Task<IActionResult> GetActivities()
         {
-            return Ok(await _context.Activities.ToListAsync());
+            return Ok(await Mediator.Send(new ListActivity.Query()));
         }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetActivityById(Guid id)
         {
-            return Ok(await _context.Activities.FindAsync(id));
+            return Ok(await Mediator.Send(new ActivityDetail.Query { Id=id}));
         }
 
         [HttpPost]
         public async Task<IActionResult> CreateActivity(Activity activity)
         {
-            _context.Activities.Add(activity);
-            return Ok(await _context.SaveChangesAsync());
+           
+            return Ok(await Mediator.Send(new CreateActivity.Command { Activity = activity}));
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteActivity(Guid id)
         {
-            var activity = await _context.Activities.FindAsync(id);
-            if (activity == null) return BadRequest();
-            _context.Activities.Remove(activity);
-            return Ok(await _context.SaveChangesAsync());
+            
+            return Ok(await Mediator.Send(new DeleteActivity.Command { id=id}));
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateActivity(Guid id,Activity activity)
         {
-            var thisActivity = await _context.Activities.FindAsync(id);
-            if (activity == null) return BadRequest();
-            thisActivity.Name = activity.Name;
-            thisActivity.Description = activity.Description;
-            thisActivity.Tags = activity.Tags;
-            _context.Activities.Update(activity);
-            return Ok(await _context.SaveChangesAsync());
+            activity.Id = id;
+            return Ok(await Mediator.Send(new EditActivity.Command
+            {
+                Activity = activity,
+                id = id
+            }));
         }
     }
 }
