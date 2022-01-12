@@ -1,3 +1,4 @@
+using API.Extensions;
 using Application.Activities;
 using Application.Core;
 using MediatR;
@@ -24,26 +25,8 @@ namespace API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllers();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
-            });
-            services.AddDbContext<DataContext>(options => {
-                options.UseNpgsql(_config.GetConnectionString("DefaultConnection"));
-            });
-
-            services.AddCors(opt =>
-            {
-                opt.AddPolicy("CorsPolicy", policy =>
-                {
-                    policy.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin();
-                });
-            });
-
-            services.AddMediatR(typeof(ListActivity.Query).Assembly);
-            services.AddAutoMapper(typeof(MappingProfile).Assembly);
+            services.AddApplicationServices(_config);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
