@@ -33,7 +33,7 @@ namespace API.Extensions
             services.AddMediatR(typeof(ListActivity.Query).Assembly);
             services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
-            return services
+            return services;
 
         }
     }
